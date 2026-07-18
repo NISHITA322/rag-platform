@@ -136,36 +136,6 @@ async def upload_document(file: UploadFile = File(...), session: AsyncSession = 
     )
 
 
-@router.get("/documents/{document_id}/status", response_model=DocumentStatusResponse)
-async def document_status(document_id: str, session: AsyncSession = Depends(get_session)):
-    doc = await session.get(Document, document_id)
-    if not doc:
-        raise HTTPException(status_code=404, detail="Document not found")
-    return DocumentStatusResponse(
-        document_id=doc.id,
-        filename=doc.filename,
-        status=doc.status.value,
-        chunk_count=doc.chunk_count,
-        error_detail=doc.error_detail,
-        validation_report=json.loads(doc.validation_report) if doc.validation_report else None,
-    )
-
-
-@router.get("/documents", response_model=DocumentListResponse)
-async def list_documents(session: AsyncSession = Depends(get_session)):
-    result = await session.execute(select(Document))
-    docs = result.scalars().all()
-    return DocumentListResponse(documents=[
-        DocumentListItem(
-            document_id=d.id,
-            filename=d.filename,
-            source_type=d.source_type.value,
-            status=d.status.value,
-            chunk_count=d.chunk_count,
-            upload_timestamp=d.upload_timestamp.isoformat(),
-        ) for d in docs
-    ])
-
 
 @router.post("/query", response_model=QueryResponse)
 async def query_documents(payload: QueryRequest, session: AsyncSession = Depends(get_session)):
@@ -214,13 +184,13 @@ async def delete_document(document_id: str, hard: bool = Query(False), session: 
     try:
         vectorstore.mark_deleted(document_id)
         soft_ok = True
-    except Exception as exc:  # noqa: BLE001
+    except Exception as exc:  
         detail_parts.append(f"Chroma soft-delete failed: {exc}")
 
     try:
         doc.status = DocumentStatus.deleted
         await session.commit()
-    except Exception as exc:  # noqa: BLE001
+    except Exception as exc:
         detail_parts.append(f"SQLite status update failed: {exc}")
         # Partial-failure handling: if SQLite update fails after Chroma
         # succeeded, we now have an inconsistency - surface it rather than
@@ -234,7 +204,7 @@ async def delete_document(document_id: str, hard: bool = Query(False), session: 
             await session.commit()
             hard_ok = True
             detail_parts.append(f"Hard-deleted {removed} vectors and document row")
-        except Exception as exc:  # noqa: BLE001
+        except Exception as exc: 
             detail_parts.append(f"Hard delete failed: {exc}")
             raise HTTPException(status_code=500, detail="; ".join(detail_parts))
 

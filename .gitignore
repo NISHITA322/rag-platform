@@ -10,6 +10,5 @@ uploads/
 *.egg-info/
 .DS_Store
 tests/
-docs/
 scripts/
 .env.example
