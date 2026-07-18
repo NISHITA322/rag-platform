@@ -68,7 +68,6 @@ def query(
     if doc_id:
         where_clauses.append({"doc_id": {"$eq": doc_id}})
 
-    print("soucre type ",source_type)
 
     where = {"$and": where_clauses} if len(where_clauses) > 1 else where_clauses[0]
 
@@ -78,12 +77,7 @@ def query(
         where=where,
     )
 
-    print("collection ",_collection.count())
     docs = _collection.get()
-
-    for meta in docs["metadatas"]:
-        print("=============================")
-        print(meta["filename"], meta["source_type"])
 
     # print("results ",result)
 

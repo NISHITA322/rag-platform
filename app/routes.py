@@ -47,7 +47,6 @@ async def _process_document(document_id: str, file_path: str, source_type: Sourc
                     file_path, settings.pdf_chunk_token_size, settings.pdf_chunk_overlap_tokens
                 )
             else:
-                print("in else")
                 chunks, reports = ingestion.process_code(file_path, settings.pdf_chunk_token_size)
 
             if not chunks:
@@ -109,7 +108,6 @@ async def upload_document(file: UploadFile = File(...), session: AsyncSession = 
     os.makedirs(settings.upload_dir, exist_ok=True)
     document_id = str(uuid.uuid4())
     source_type = _source_type_for(file.filename)
-    print("source type ",source_type)
     saved_path = os.path.join(settings.upload_dir, f"{document_id}_{file.filename}")
 
     with open(saved_path, "wb") as f:
@@ -145,10 +143,7 @@ async def query_documents(payload: QueryRequest, session: AsyncSession = Depends
     doc_id = payload.filters.doc_id if payload.filters else None
 
     query_embedding = await _embedder.embed_query(payload.query)
-    print("source type ",source_type)
     hits = vectorstore.query(query_embedding, top_k=top_k, source_type=source_type, doc_id=doc_id)
-
-    print("data : ",hits)
    
     if not hits:
         answer = "No relevant content was found in the knowledge base for this query."

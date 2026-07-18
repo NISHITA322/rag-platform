@@ -152,7 +152,6 @@ def _extract_pdf_text_by_page(path: str) -> dict[int, str]:
 
         # If very little text was found, use OCR
         if len(text.strip()) < 20:
-            print(f"OCR used for page {page_num}")
             text = _ocr_page(page)
 
         text_by_page[page_num] = text
@@ -341,12 +340,10 @@ def extract_code(path: str) -> tuple[dict, ValidationReport]:
     """Parse a .py file with ast and pull out top-level functions/classes
     as structural units, never splitting a function body mid-way."""
     report = ValidationReport(stage="code_extraction")
-    print("in extarcat code")
 
     with open(path, "r", encoding="utf-8") as f:
         source = f.read()
     lines = source.splitlines()
-    print("lines ",lines)
 
     try:
         tree = ast.parse(source)
@@ -377,11 +374,7 @@ def extract_code(path: str) -> tuple[dict, ValidationReport]:
                else "AST-extracted unit count does not match regex-based def/class count "
                     "(expected if defs are nested inside classes/functions - verify manually)")
     report.add("total_lines", len(lines))
-    print("REPORT : ",report)
-    print("units ",units)
-    print("lines : ",lines)
 
-    print("source ",source)
     return {"source": source, "units": units, "lines": lines}, report
 
 
@@ -439,7 +432,6 @@ def chunk_code(extraction: dict, max_tokens: int) -> tuple[list[dict], Validatio
     report.add("unparseable_full_units", unparseable_full_units,
                ok=(unparseable_full_units == 0),
                warn=None if unparseable_full_units == 0 else "Some full function/class chunks failed ast.parse")
-    print("CHUNKED REPORT ",chunks)
 
     return chunks, report
 
@@ -467,7 +459,6 @@ def process_pdf(path: str, token_size: int, overlap_tokens: int) -> tuple[list[d
 
 
 def process_code(path: str, max_tokens: int) -> tuple[list[dict], list[ValidationReport]]:
-    print("in process code")
     extraction, extract_report = extract_code(path)
     chunks, chunk_report = chunk_code(extraction, max_tokens)
     return chunks, [extract_report, chunk_report]
