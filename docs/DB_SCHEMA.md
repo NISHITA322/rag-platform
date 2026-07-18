@@ -72,15 +72,6 @@ Chroma metadata mirrors the SQL columns needed for filtering at query time
 can't join against SQLite — anything you need to filter search results by must be
 present directly on the Chroma metadata, not just in the relational tables.
 
-## Query patterns
-
-1. "Is my upload done processing?" → `GET /documents/{id}/status` → single-row
-   lookup by primary key.
-2. "What can I ask about?" → `GET /documents` → full scan, acceptable at this scale.
-3. "Answer this question" → embed → Chroma similarity search (not a SQL query at
-   all) → SQLite write only for the log.
-4. "Delete this document" → SQLite status update + Chroma metadata update (soft) or
-   SQLite row delete + Chroma vector delete (hard).
 
 ## Caching
 

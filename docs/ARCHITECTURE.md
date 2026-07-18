@@ -4,8 +4,7 @@
 
 The platform ingests documents (PDF or Python source) and answers natural-language
 questions about them using retrieval-augmented generation. It exposes three core
-REST endpoints (`POST /documents`, `POST /query`, `DELETE /documents/{id}`) plus two
-supporting endpoints (`GET /documents`, `GET /documents/{id}/status`).
+REST endpoints (`POST /documents`, `POST /query`, `DELETE /documents/{id}`).
 
 ## Ingestion flow
 
